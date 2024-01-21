@@ -68,10 +68,11 @@ resource "yandex_compute_instance" "vm-build" {
     inline = [
       "sudo apt update", 
       "sudo apt-get update", 
+      "sudo apt install mc -y",
       "sudo apt install git -y",
       "sudo apt install docker.io -y",
-      "sudo apt install default-jdk",
-      "sudo apt install maven",
+      "sudo apt install default-jdk -y",
+      "sudo apt install maven -y",
 
       "cd /tmp",
       "git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
@@ -129,7 +130,7 @@ resource "yandex_compute_disk" "ubuntu2004_15GB" {
 #############################################################
 resource "yandex_container_registry" "my-reg" {
   name = "mydockerregistry"
-  folder_id = "crpdla5isvrlmlvea9ha"
+  folder_id = "b1g5ks1opqq9pgacsaoo"
   labels = {
     my-label = "my-label-value"
   }
