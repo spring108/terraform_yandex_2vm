@@ -72,12 +72,17 @@ resource "yandex_compute_instance" "vm-build" {
       "sudo apt install docker.io -y",
       "sudo apt install default-jdk",
       "sudo apt install maven",
-      "cd /tmp && git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
-      "cd /tmp/boxfuse-sample-java-war-hello && mvn package",
-      "cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /tmp/terraform/hello.war",
-      "sudo docker build -t mysite1 .",
-      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.mydockerregistry.id}/mysite1",
 
+      "cd /tmp",
+      "git clone https://github.com/boxfuse/boxfuse-sample-java-war-hello.git",
+
+      "cd /tmp/boxfuse-sample-java-war-hello",
+      "mvn package",
+
+      "cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /tmp/terraform/hello.war",
+      
+      "sudo docker build -t mysite1 .",
+      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.mydockerregistry.id}/mysite1"
     ]
   }
 
