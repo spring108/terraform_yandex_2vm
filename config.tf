@@ -61,7 +61,7 @@ resource "yandex_compute_instance" "vm-build" {
   }
   provisioner "file" {
     source      = "./Dockerfile"
-    destination = "/tmp/terraform/Dockerfile"
+    destination = "/tmp/Dockerfile"
   }
   # make the artifact -------------------------
     provisioner "remote-exec" {
@@ -80,8 +80,11 @@ resource "yandex_compute_instance" "vm-build" {
       "cd /tmp/boxfuse-sample-java-war-hello",
       "mvn package",
 
+      "mkdir /tmp/terraform",
       "cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /tmp/terraform/hello.war",
+      "cp /tmp/Dockerfile /tmp/terraform/Dockerfile",
       
+      "cd /tmp/terraform",
       "sudo docker build -t mysite1 .",
       "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.my-reg.id}/mysite1"
     ]
