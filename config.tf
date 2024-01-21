@@ -82,7 +82,7 @@ resource "yandex_compute_instance" "vm-build" {
       "cp /tmp/boxfuse-sample-java-war-hello/target/hello-1.0.war /tmp/terraform/hello.war",
       
       "sudo docker build -t mysite1 .",
-      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.mydockerregistry.id}/mysite1"
+      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.my-reg.id}/mysite1"
     ]
   }
 
