@@ -38,7 +38,7 @@ resource "yandex_compute_instance" "vm-build" {
     memory = 2
   }
   boot_disk {
-    disk_id = yandex_compute_disk.ubuntu2004_15GB.id
+    disk_id = yandex_compute_disk.build_ubuntu2004_15GB.id
   }
   network_interface {
     subnet_id = "e9buvssk2htbkq921avo"
@@ -107,7 +107,7 @@ resource "yandex_compute_instance" "vm-prod" {
     memory = 2
   }
   boot_disk {
-    disk_id = yandex_compute_disk.ubuntu2004_15GB.id
+    disk_id = yandex_compute_disk.prod_ubuntu2004_15GB.id
   }
   network_interface {
     subnet_id = "e9buvssk2htbkq921avo"
@@ -168,17 +168,22 @@ resource "yandex_compute_instance" "vm-prod" {
 
 
 #############################################################
-### TEMPLATES
+### VM DISKS DECLARATION
 #############################################################
-
-# boot disk template = ubuntu 20.04
+# boot disk template with ubuntu 20.04
 data "yandex_compute_image" "ubuntu_image" {
   family = "ubuntu-2004-lts"
 }
 
-
-# boot disk template = ubuntu 20.04 with 15GB
-resource "yandex_compute_disk" "ubuntu2004_15GB" {
+# boot disk for vm-build = ubuntu 20.04 with 15GB
+resource "yandex_compute_disk" "build_ubuntu2004_15GB" {
+  type     = "network-ssd"
+  zone     = "ru-central1-a"
+  image_id = data.yandex_compute_image.ubuntu_image.id
+  size = 15
+}
+# boot disk for vm-prod = ubuntu 20.04 with 15GB
+resource "yandex_compute_disk" "prod_ubuntu2004_15GB" {
   type     = "network-ssd"
   zone     = "ru-central1-a"
   image_id = data.yandex_compute_image.ubuntu_image.id
@@ -187,8 +192,9 @@ resource "yandex_compute_disk" "ubuntu2004_15GB" {
 
 
 
+
 #############################################################
-### Yandex Registry: mydockerregistry
+### Yandex Docker Registry: mydockerregistry
 #############################################################
 resource "yandex_container_registry" "my-reg" {
   name = "mydockerregistry"
