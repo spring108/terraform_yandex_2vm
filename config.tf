@@ -63,8 +63,8 @@ resource "yandex_compute_instance" "vm-build" {
     source      = "./Dockerfile"
     destination = "/tmp/Dockerfile"
   }
-  # make the artifact -------------------------
-    provisioner "remote-exec" {
+  # make the artifact, build, tag & push to yeandex registry -------------------------
+  provisioner "remote-exec" {
     inline = [
       "sudo apt update", 
       "sudo apt-get update", 
@@ -86,7 +86,8 @@ resource "yandex_compute_instance" "vm-build" {
       
       "cd /tmp/terraform",
       "sudo docker build -t mysite1 .",
-      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.my-reg.id}/mysite1"
+      "sudo docker tag mysite1 cr.yandex/${yandex_container_registry.my-reg.id}/mysite1",
+      "sudo docker push cr.yandex/${yandex_container_registry.my-reg.id}/mysite1"
     ]
   }
 
@@ -133,7 +134,7 @@ resource "yandex_compute_instance" "vm-prod" {
     destination = "/tmp/Dockerfile"
   }
   # pull & run artifact -------------------------
-    provisioner "remote-exec" {
+  provisioner "remote-exec" {
     inline = [
       "sudo apt update", 
       "sudo apt-get update", 
