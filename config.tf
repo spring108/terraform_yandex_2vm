@@ -95,6 +95,65 @@ resource "yandex_compute_instance" "vm-build" {
 
 
 
+#############################################################
+### VM "prod"
+#############################################################
+# vm "build" resource configurations
+resource "yandex_compute_instance" "vm-prod" {
+  name = "prod"
+  allow_stopping_for_update = true
+  resources {
+    cores  = 2
+    memory = 2
+  }
+  boot_disk {
+    disk_id = yandex_compute_disk.ubuntu2004_15GB.id
+  }
+  network_interface {
+    subnet_id = "e9buvssk2htbkq921avo"
+    nat       = true
+  }
+  metadata = {
+    user-data = "${file("./public_keys.yml")}"
+  }
+  scheduling_policy {
+    preemptible = true 
+  }
+
+
+  # init vm-prod -------------------------
+  connection {
+    type     = "ssh"
+    user     = "spring"
+    private_key = file("/root/.ssh/id_rsa")
+    host = yandex_compute_instance.vm-prod.network_interface.0.nat_ip_address
+  }
+  provisioner "file" {
+    source      = "./Dockerfile"
+    destination = "/tmp/Dockerfile"
+  }
+  # pull & run artifact -------------------------
+    provisioner "remote-exec" {
+    inline = [
+      "sudo apt update", 
+      "sudo apt-get update", 
+      "sudo apt install mc -y",
+      "sudo apt install docker.io -y",
+      
+      "sudo docker pull cr.yandex/${yandex_container_registry.my-reg.id}/mysite1",
+      "sudo docker run -d -p 8080:8080 cr.yandex/${yandex_container_registry.my-reg.id}/mysite1"
+    ]
+  }
+
+  # run after vm-build -------------------------
+  depends_on = [
+    yandex_compute_instance.vm-build
+  ]
+
+}
+
+
+
 
 
 
@@ -135,7 +194,7 @@ resource "yandex_container_registry" "my-reg" {
   name = "mydockerregistry"
   folder_id = "b1g5ks1opqq9pgacsaoo"
   labels = {
-    my-label = "my-label-value"
+    my-label = "it-is-mysite1"
   }
 }
 resource "yandex_container_registry_iam_binding" "puller" {
